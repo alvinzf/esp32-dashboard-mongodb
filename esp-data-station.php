@@ -158,6 +158,7 @@ include_once 'esp-database.php';
                     <th scope="col">Sensor</th>
                     <th scope="col">Value</th>
                     <th scope="col">Timestamp</th>
+                    <th scope="col">Classification</th>
                 </tr>
             </thead>';
         require 'config.php';
@@ -175,6 +176,7 @@ include_once 'esp-database.php';
             echo '<td>' . $r->sensorId . '</td>';
             echo '<td>' . $r->value . '</td>';
             echo '<td>' . $date->format('Y-m-d H:i:s') . '</td>';
+            echo '<td>' . $r->class . '</td>';
             echo '</tr>';
             echo '</tbody>';
         }
