@@ -26,7 +26,7 @@ include_once 'esp-database.php';
                 <a class="nav-link" href="#">Dashboard <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="day.php">Day</a>
+                <a class="nav-link" href="#">Month</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">Year</a>
@@ -50,7 +50,7 @@ include_once 'esp-database.php';
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script>
         Highcharts.getJSON(
-            'http://localhost/esp32/api.php',
+            'http://localhost/esp32/api-day.php',
 
             function(data) {
                 // console.log(data)
