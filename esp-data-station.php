@@ -55,15 +55,15 @@ include_once 'esp-database.php';
             function(data) {
                 // console.log(data)
 
-                const _date = data.map(d => (parseInt((d.ts.$date.$numberLong))).valueOf());
+                const _date = data.map(d => (parseInt(d.ts) * 1000));
                 // console.log(_date);
-                const value = data.map(d => d.value);
+                const value = data.map(d => (parseInt(d.value)));
                 // console.log(value);
                 var result = [];
                 for (var i = 0; i < _date.length; i++) {
                     result.push([_date[i], value[i]]);
                 }
-                // console.log(result);
+                console.log(result);
                 const timezone = new Date().getTimezoneOffset()
 
                 Highcharts.setOptions({
@@ -71,7 +71,7 @@ include_once 'esp-database.php';
                         timezoneOffset: timezone
                     }
                 });
-                $('#chart-A').highcharts({
+                Highcharts.chart('container', {
                     chart: {
                         zoomType: 'x'
                     },
@@ -130,70 +130,53 @@ include_once 'esp-database.php';
             }
         );
     </script>
-    <script>
-        $.getJSON('http://localhost/esp32/api-max-min.php',
 
-            function(data) {
-                console.log(data);
-                document.getElementById('max-val').innerHTML = data[0].max;
-            });
-    </script>
-    <div id="chart-A" class="chart"></div>
-    <div id="chart-B" class="chart"></div>
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <p class="highcharts-description">
+            Highcharts has extensive support for time series, and will adapt
+            intelligently to the input data. Click and drag in the chart to zoom in
+            and inspect the data.
+        </p>
+    </figure>
     <h3 class="cent mt-5">Recent Readings</h3>
-    <?php
-    require 'config.php';
-    $res = $collection->aggregate(array(
-        array(
-            '$group' => array(
-                '_id' => '',
-                'max' => array('$max' => '$value'),
-                'min' => array('$min' => '$value')
-            )
-        )
-    ));
+    <section class="content">
+        <div class="cent">
+            <div class=" d-flex flex-row">
 
-    // $result = $collection->find([]);
-    foreach ($res as $r) {
-
-    ?>
-        <section class="content">
-            <div class="cent">
-                <div class=" d-flex flex-row">
-
-                    <div class="p-2">
-                        <div class="mask">
-                            <div class="semi-circle"></div>
-                            <div class="semi-circle--mask"></div>
-                        </div>
-                        <p style="font-size: 30px;" class="cent" id="max-val"></p>
-                        <table cellspacing="5" cellpadding="5" class="cent">
-                            <tr>
-                                <th colspan="3">Last 3 Hours</th>
-                            </tr>
-
-                        </table>
+                <div class="p-2">
+                    <div class="mask">
+                        <div class="semi-circle"></div>
+                        <div class="semi-circle--mask"></div>
                     </div>
-                    <div class="p-2">
-                        <div class="mask">
-                            <div class="semi-circle"></div>
-                            <div class="semi-circle--mask"></div>
-                        </div>
-                        <p style="font-size: 30px;" class="cent" id="temp">Max : 55</p>
-                        <table cellspacing="5" cellpadding="5" class="cent">
-                            <tr>
-                                <th colspan="3">Last 3 Hours</th>
-                            </tr>
+                    <p style="font-size: 30px;" class="cent" id="max-val">Max : 55</p>
+                    <table cellspacing="5" cellpadding="5" class="cent">
+                        <tr>
+                            <th colspan="3">Last 3 Hours</th>
+                        </tr>
 
-                        </table>
-                    </div>
-
-
-
+                    </table>
                 </div>
+                <div class="p-2">
+                    <div class="mask">
+                        <div class="semi-circle"></div>
+                        <div class="semi-circle--mask"></div>
+                    </div>
+                    <p style="font-size: 30px;" class="cent" id="temp">Max : 55</p>
+                    <table cellspacing="5" cellpadding="5" class="cent">
+                        <tr>
+                            <th colspan="3">Last 3 Hours</th>
+                        </tr>
+
+                    </table>
+                </div>
+
+
+
             </div>
-        </section>
-    <?php } ?>
+        </div>
+    </section>
+
     <div class="mx-auto w-75">
         <?php
         echo '<h2> Sensor Readings </h2>
@@ -209,15 +192,16 @@ include_once 'esp-database.php';
                 </tr>
             </thead>';
         require 'config.php';
-        $result = $collection->find([]);
+        $sql = "SELECT * FROM readings";
+        $query = mysqli_query($db, $sql);
 
-        foreach ($result as $r) {
-            $mongo_date = $r->ts;
-            $datetime = $mongo_date->toDateTime();
-            $time = $datetime->format(DATE_RSS);
-            $date = new DateTime($time);
-            $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
-            $classification = $r->class;
+        while ($r = mysqli_fetch_array($query)) {
+            // $mongo_date = $r->ts;
+            // $datetime = $mongo_date->toDateTime();
+            // $time = $datetime->format(DATE_RSS);
+            // $date = new DateTime($time);
+            // $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
+            $classification = $r['classification'];
             if (strlen($classification) > 0) {
                 $classification = explode("#", $classification);
                 if (count($classification) > 6) {
@@ -260,10 +244,10 @@ include_once 'esp-database.php';
 
             echo '<tbody>';
             echo '<tr>';
-            echo '<td>' . $r->_id . '</td>';
-            echo '<td>' . $r->sensorId . '</td>';
-            echo '<td>' . $r->value . '</td>';
-            echo '<td>' . $date->format('Y-m-d H:i:s') . '</td>';
+            echo '<td>' . $r['id'] . '</td>';
+            echo '<td>' . $r['sensor'] . '</td>';
+            echo '<td>' . $r['value'] . '</td>';
+            echo '<td>' . $r['reading_time'] . '</td>';
             echo '<td>' . $result . '</td>';
             echo '</tr>';
             echo '</tbody>';

@@ -1,4 +1,12 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
-$collection = (new MongoDB\Client())->esp32->noise;
-?>
+
+$server = "localhost";
+$user = "root";
+$password = "";
+$nama_database = "noise_esp32";
+
+$db = mysqli_connect($server, $user, $password, $nama_database);
+
+if (!$db) {
+    die("Gagal terhubung dengan database: " . mysqli_connect_error());
+}
